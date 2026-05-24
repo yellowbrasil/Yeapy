@@ -1,0 +1,41 @@
+# Yeapy — Ofertas de 24 horas
+
+> Yeapy e uma plataforma brasileira de descoberta de ofertas temporarias onde empresas publicam promocoes validas por apenas 24 horas.
+
+## O que e o Yeapy
+
+Yeapy e uma plataforma de ofertas temporarias. Empresas cadastradas publicam produtos e servicos com precos promocionais que expiram automaticamente em 24 horas. O consumidor acessa diariamente para encontrar oportunidades reais.
+
+## Diferencial
+
+- Toda oferta expira em 24 horas
+- Se a empresa republicar o mesmo produto, o preco obrigatoriamente deve ser menor que o anterior
+- Isso elimina promocoes falsas e gera credibilidade real
+- O consumidor tem incentivo para acessar todos os dias
+
+## Como funciona
+
+1. Empresas se cadastram e pagam uma assinatura mensal
+2. Publicam ofertas com preco original e preco promocional
+3. A oferta fica ativa por 24 horas com contador regressivo visivel
+4. Apos 24 horas, a oferta expira automaticamente
+5. O consumidor e redirecionado para WhatsApp, site da empresa, Mercado Livre, Shopee ou qualquer link externo
+
+## Tipos de oferta
+
+- Ofertas locais: por cidade (Porto Alegre, Sao Paulo, Curitiba, etc.)
+- Ofertas nacionais: e-commerce com entrega para todo Brasil
+
+## Categorias
+
+Gastronomia, Tecnologia, Moda, Beleza, Saude, Educacao, Casa e Decoracao, Esportes, Automotivo, Servicos, Entretenimento, Pets.
+
+## Informacoes tecnicas
+
+- URL: https://yeapy.shop
+- Plataforma web responsiva (mobile-first)
+- Disponivel em portugues brasileiro (pt-BR)
+
+## Contato
+
+- Email: contato@yeapy.shop
