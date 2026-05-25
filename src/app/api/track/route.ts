@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
   const admin = createAdminClient()
 
-  // Registrar clique no historico
+  // Registrar clique no histórico
   await admin.from("offer_clicks").insert({
     offer_id: offerId,
     company_id: companyId,

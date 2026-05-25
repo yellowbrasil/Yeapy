@@ -32,11 +32,11 @@ export async function generateMetadata({ params }: OfferPageProps): Promise<Meta
     .eq("id", id)
     .single()
 
-  if (!offer) return { title: "Oferta nao encontrada" }
+  if (!offer) return { title: "Oferta não encontrada" }
 
   return {
     title: offer.title,
-    description: offer.description || `Oferta com preco especial na Yeapy.`,
+    description: offer.description || `Oferta com preço especial na Yeapy.`,
     openGraph: {
       title: offer.title,
       description: offer.description || undefined,
@@ -173,7 +173,7 @@ export default async function OfferDetailPage({ params }: OfferPageProps) {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <TrendingDown className="h-5 w-5 text-primary" />
-                  Historico de precos
+                  Histórico de preços
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -196,7 +196,7 @@ export default async function OfferDetailPage({ params }: OfferPageProps) {
                 </div>
                 {product.total_offers > 1 && (
                   <p className="text-xs text-muted-foreground mt-3">
-                    Menor preco ja registrado: {formatCents(product.lowest_price_cents || offer.promotional_price_cents)}
+                    Menor preço já registrado: {formatCents(product.lowest_price_cents || offer.promotional_price_cents)}
                   </p>
                 )}
               </CardContent>
@@ -259,7 +259,7 @@ export default async function OfferDetailPage({ params }: OfferPageProps) {
 
               {/* Views */}
               <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t">
-                <span>{offer.views_count || 0} visualizacoes</span>
+                <span>{offer.views_count || 0} visualizações</span>
                 <span>{offer.clicks_count || 0} cliques</span>
               </div>
             </CardContent>

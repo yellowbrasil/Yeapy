@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   return {
     title: category ? `Ofertas de ${category.name}` : "Categoria",
     description: category
-      ? `Encontre as melhores ofertas de ${category.name} com desconto e expiracao em 24 horas.`
+      ? `Encontre as melhores ofertas de ${category.name} com desconto e expiração em 24 horas.`
       : undefined,
   }
 }
@@ -42,7 +42,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)
@@ -90,7 +90,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             Nenhuma oferta ativa nesta categoria
           </h3>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Novas ofertas sao publicadas diariamente. Volte em breve!
+            Novas ofertas são publicadas diariamente. Volte em breve!
           </p>
         </div>
       )}

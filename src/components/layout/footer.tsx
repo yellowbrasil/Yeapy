@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Flame } from "lucide-react"
+import Image from "next/image"
 
 export function Footer() {
   return (
@@ -8,11 +8,16 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <Flame className="h-5 w-5 text-primary" />
-              <span className="font-bold">Yeapy</span>
+              <Image
+                src="/images/logo.png"
+                alt="Yeapy"
+                width={274}
+                height={91}
+                className="h-16 w-auto"
+              />
             </div>
             <p className="text-sm text-muted-foreground">
-              Ofertas temporarias de 24 horas. Oportunidades reais todos os dias.
+              Ofertas temporárias de 24 horas. Oportunidades reais todos os dias.
             </p>
           </div>
 
@@ -25,6 +30,9 @@ export function Footer() {
               <Link href="/busca" className="text-sm text-muted-foreground hover:text-foreground">
                 Buscar
               </Link>
+              <Link href="/quem-somos" className="text-sm text-muted-foreground hover:text-foreground">
+                Quem somos
+              </Link>
             </div>
           </div>
 
@@ -33,6 +41,9 @@ export function Footer() {
             <div className="flex flex-col gap-2">
               <Link href="/registro" className="text-sm text-muted-foreground hover:text-foreground">
                 Cadastre sua empresa
+              </Link>
+              <Link href="/precos" className="text-sm text-muted-foreground hover:text-foreground">
+                Preços e planos
               </Link>
               <Link href="/login" className="text-sm text-muted-foreground hover:text-foreground">
                 Acessar painel

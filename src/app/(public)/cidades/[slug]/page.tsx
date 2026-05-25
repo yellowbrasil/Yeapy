@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: CityPageProps): Promise<Metad
   return {
     title: city ? `Ofertas em ${city.name} - ${city.state}` : "Cidade",
     description: city
-      ? `Encontre as melhores ofertas em ${city.name}, ${city.state} com desconto e expiracao em 24 horas.`
+      ? `Encontre as melhores ofertas em ${city.name}, ${city.state} com desconto e expiração em 24 horas.`
       : undefined,
   }
 }
@@ -42,7 +42,7 @@ export default async function CityPage({ params }: CityPageProps) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)
@@ -91,7 +91,7 @@ export default async function CityPage({ params }: CityPageProps) {
             Nenhuma oferta ativa em {city.name}
           </h3>
           <p className="text-muted-foreground text-sm max-w-md mx-auto">
-            Novas ofertas sao publicadas diariamente. Volte em breve!
+            Novas ofertas são publicadas diariamente. Volte em breve!
           </p>
         </div>
       )}

@@ -3,7 +3,8 @@ import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Clock } from "lucide-react"
+import { Plus, Clock, AlertCircle } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 
 export const metadata = {
@@ -18,7 +19,7 @@ export default async function OffersListPage() {
 
   const { data: company } = await supabase
     .from("companies")
-    .select("id")
+    .select("id, profile_complete")
     .eq("owner_id", user.id)
     .single()
 
@@ -26,12 +27,30 @@ export default async function OffersListPage() {
 
   const { data: offers } = await supabase
     .from("offers")
-    .select("*, category:categories(name), city:cities(name, state)")
+    .select("*, category:categories(name), city:cities(name, state), images")
     .eq("company_id", company.id)
     .order("created_at", { ascending: false })
 
   return (
     <div className="space-y-6">
+      {!company.profile_complete && (
+        <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold">Complete seu perfil para anunciar</p>
+            <p className="mt-1">
+              Antes de publicar ofertas, preencha os dados obrigatórios da empresa:
+              Razão Social, nome do responsável, endereço completo com CEP e WhatsApp.
+            </p>
+            <Link href="/painel/perfil">
+              <Button size="sm" variant="outline" className="mt-3 border-amber-300 text-amber-800 hover:bg-amber-100">
+                Completar perfil
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Minhas ofertas</h1>
         <Link href="/painel/ofertas/nova">
@@ -48,8 +67,17 @@ export default async function OffersListPage() {
             <Card key={offer.id}>
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-lg">
-                    {offer.image_url ? "🖼️" : "📦"}
+                  <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center text-lg overflow-hidden relative">
+                    {offer.image_url ? (
+                      <Image
+                        src={offer.image_url}
+                        alt={offer.title}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span>📦</span>
+                    )}
                   </div>
                   <div>
                     <p className="font-medium">{offer.title}</p>
@@ -96,7 +124,7 @@ export default async function OffersListPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground mb-4">
-              Voce ainda nao tem ofertas cadastradas.
+              Você ainda não tem ofertas cadastradas.
             </p>
             <Link href="/painel/ofertas/nova">
               <Button>

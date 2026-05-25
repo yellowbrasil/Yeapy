@@ -6,6 +6,7 @@ import { MapPin, ExternalLink, ArrowDown } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CountdownTimer } from "./countdown-timer"
+import { VerifiedBadge } from "@/components/verification/verified-badge"
 import type { OfferWithRelations } from "@/types/database"
 
 interface OfferCardProps {
@@ -59,8 +60,11 @@ export function OfferCard({ offer }: OfferCardProps) {
         </div>
 
         <CardContent className="p-3 space-y-2">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span>{offer.company.name}</span>
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span>{offer.company.name}</span>
+              <VerifiedBadge isVerified={offer.company.is_verified} size="sm" />
+            </div>
             {offer.city && (
               <>
                 <span>•</span>

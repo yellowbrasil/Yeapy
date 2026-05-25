@@ -7,7 +7,7 @@ import Link from "next/link"
 
 export const metadata = {
   title: "Buscar ofertas",
-  description: "Busque por produtos, servicos e ofertas em tempo real na Yeapy.",
+  description: "Busque por produtos, serviços e ofertas em tempo real na Yeapy.",
 }
 
 interface SearchPageProps {
@@ -28,7 +28,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)

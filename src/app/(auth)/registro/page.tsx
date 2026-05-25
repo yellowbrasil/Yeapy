@@ -39,38 +39,50 @@ export default function RegisterPage() {
     setError("")
     setLoading(true)
 
-    const supabase = createClient()
+    try {
+      // 1. Create user + company via server API (bypasses RLS)
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          companyName: form.companyName,
+          slug: form.slug,
+          whatsapp: form.whatsapp,
+        }),
+      })
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-    })
+      const data = await res.json()
 
-    if (authError || !authData.user) {
-      setError(authError?.message || "Erro ao criar conta.")
-      setLoading(false)
-      return
-    }
-
-    const { error: companyError } = await supabase.from("companies").insert({
-      owner_id: authData.user.id,
-      name: form.companyName,
-      slug: form.slug,
-      whatsapp: form.whatsapp || null,
-    })
-
-    if (companyError) {
-      if (companyError.code === "23505") {
-        setError("Esta URL ja esta em uso. Escolha outra.")
-      } else {
-        setError("Erro ao cadastrar empresa. Tente novamente.")
+      if (!res.ok) {
+        setError(data.error || "Erro ao cadastrar. Tente novamente.")
+        setLoading(false)
+        return
       }
-      setLoading(false)
-      return
-    }
 
-    router.push("/painel")
-    router.refresh()
+      // 2. Sign in the user on the client
+      const supabase = createClient()
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: form.email,
+        password: form.password,
+      })
+
+      if (signInError) {
+        // Account created but auto-login failed
+        setError("Conta criada! Faça login com seu email e senha.")
+        setLoading(false)
+        router.push("/login")
+        return
+      }
+
+      // 3. Redirect to payment page
+      router.push("/pagamento")
+      router.refresh()
+    } catch {
+      setError("Erro de conexão. Tente novamente.")
+      setLoading(false)
+    }
   }
 
   return (
@@ -143,7 +155,7 @@ export default function RegisterPage() {
             <Input
               id="password"
               type="password"
-              placeholder="Minimo 6 caracteres"
+              placeholder="Mínimo 6 caracteres"
               value={form.password}
               onChange={(e) => updateField("password", e.target.value)}
               required
@@ -152,13 +164,17 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="whatsapp">WhatsApp (opcional)</Label>
+            <Label htmlFor="whatsapp">Celular / WhatsApp *</Label>
             <Input
               id="whatsapp"
               placeholder="(51) 99999-9999"
               value={form.whatsapp}
               onChange={(e) => updateField("whatsapp", e.target.value)}
+              required
             />
+            <p className="text-xs text-muted-foreground">
+              Usado para contato com clientes nas ofertas
+            </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
@@ -167,7 +183,7 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-center text-sm text-muted-foreground mt-4">
-          Ja tem conta?{" "}
+          Já tem conta?{" "}
           <Link href="/login" className="text-primary hover:underline font-medium">
             Entrar
           </Link>

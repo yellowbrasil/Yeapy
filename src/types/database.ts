@@ -308,7 +308,7 @@ export type Offer = Database["public"]["Tables"]["offers"]["Row"]
 export type OfferHistory = Database["public"]["Tables"]["offer_history"]["Row"]
 
 export type OfferWithRelations = Offer & {
-  company: Pick<Company, "id" | "name" | "slug" | "logo_url" | "whatsapp">
+  company: Pick<Company, "id" | "name" | "slug" | "logo_url" | "whatsapp" | "is_verified">
   category: Pick<Category, "id" | "name" | "slug">
   city: Pick<City, "id" | "name" | "state" | "slug"> | null
   product: Pick<Product, "id" | "name" | "lowest_price_cents" | "total_offers">

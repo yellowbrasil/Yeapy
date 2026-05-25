@@ -83,7 +83,7 @@ export function SearchForm({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="O que voce procura? Ex: pizza, notebook, academia..."
+            placeholder="O que você procura? Ex: pizza, notebook, academia..."
             className="pl-10 h-11"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -133,7 +133,7 @@ export function SearchForm({
             <SelectContent>
               <SelectItem value="recent">Mais recentes</SelectItem>
               <SelectItem value="expiring">Acabando em breve</SelectItem>
-              <SelectItem value="discount">Menor preco</SelectItem>
+              <SelectItem value="discount">Menor preço</SelectItem>
             </SelectContent>
           </Select>
 

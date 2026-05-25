@@ -31,9 +31,9 @@ export default async function HistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Historico de precos</h1>
+        <h1 className="text-2xl font-bold">Histórico de preços</h1>
         <p className="text-muted-foreground text-sm">
-          Veja o historico de precos dos seus produtos.
+          Veja o histórico de preços dos seus produtos.
         </p>
       </div>
 
@@ -82,7 +82,7 @@ export default async function HistoryPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Sem historico.</p>
+                  <p className="text-sm text-muted-foreground">Sem histórico.</p>
                 )}
               </CardContent>
             </Card>

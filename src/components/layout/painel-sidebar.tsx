@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Tag, Clock, UserCircle, LogOut, Flame } from "lucide-react"
+import { LayoutDashboard, Tag, Clock, UserCircle, LogOut, Flame, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -10,7 +10,8 @@ import { useRouter } from "next/navigation"
 const sidebarLinks = [
   { href: "/painel", label: "Dashboard", icon: LayoutDashboard },
   { href: "/painel/ofertas", label: "Minhas ofertas", icon: Tag },
-  { href: "/painel/historico", label: "Historico", icon: Clock },
+  { href: "/painel/avaliacoes", label: "Avaliações", icon: MessageSquare },
+  { href: "/painel/historico", label: "Histórico", icon: Clock },
   { href: "/painel/perfil", label: "Perfil da empresa", icon: UserCircle },
 ]
 

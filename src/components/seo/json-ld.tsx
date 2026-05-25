@@ -19,7 +19,7 @@ export function WebsiteJsonLd() {
         "@type": "WebSite",
         name: "Yeapy",
         url: "https://yeapy.shop",
-        description: "Plataforma de ofertas temporarias de 24 horas. Descubra oportunidades reais todos os dias.",
+        description: "Plataforma de ofertas temporárias de 24 horas. Descubra oportunidades reais todos os dias.",
         potentialAction: {
           "@type": "SearchAction",
           target: {

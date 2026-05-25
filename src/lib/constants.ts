@@ -1,5 +1,5 @@
 export const APP_NAME = "Yeapy"
-export const APP_DESCRIPTION = "Ofertas temporarias com prazo de 24 horas. Descubra oportunidades reais todos os dias."
+export const APP_DESCRIPTION = "Ofertas temporárias com prazo de 24 horas. Descubra oportunidades reais todos os dias."
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
 export const OFFER_DURATION_HOURS = 24

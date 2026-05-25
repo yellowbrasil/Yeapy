@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: "Nao autorizado" }, { status: 401 })
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 
   const body = await request.json()
@@ -72,17 +72,27 @@ export async function POST(request: NextRequest) {
     whatsappLink,
     isNational,
     imageUrl,
+    images,
+    deliveryAreas,
   } = body
 
   // Buscar empresa do usuario
   const { data: company } = await supabase
     .from("companies")
-    .select("id, plan_id")
+    .select("id, plan_id, profile_complete")
     .eq("owner_id", user.id)
     .single()
 
   if (!company) {
-    return NextResponse.json({ error: "Empresa nao encontrada" }, { status: 404 })
+    return NextResponse.json({ error: "Empresa não encontrada" }, { status: 404 })
+  }
+
+  // Check if profile is complete before allowing offer creation
+  if (!company.profile_complete) {
+    return NextResponse.json(
+      { error: "Complete seu perfil antes de publicar ofertas. Acesse Perfil da empresa." },
+      { status: 403 }
+    )
   }
 
   // Verificar limite de ofertas ativas do plano
@@ -108,11 +118,11 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (product) {
-    // REGRA CRITICA: preco deve ser menor que o anterior
+    // REGRA CRÍTICA: preço deve ser menor que o anterior
     if (product.last_offer_price_cents && promotionalPriceCents >= product.last_offer_price_cents) {
       return NextResponse.json(
         {
-          error: `O preco promocional deve ser menor que R$ ${(product.last_offer_price_cents / 100).toFixed(2)} (ultimo preco deste produto).`,
+          error: `O preço promocional deve ser menor que R$ ${(product.last_offer_price_cents / 100).toFixed(2)} (último preço deste produto).`,
           lastPrice: product.last_offer_price_cents,
         },
         { status: 400 }
@@ -136,7 +146,7 @@ export async function POST(request: NextRequest) {
     product = newProduct
   }
 
-  // Calcular expiracao
+  // Calcular expiração
   const startsAt = new Date()
   const expiresAt = new Date(startsAt.getTime() + OFFER_DURATION_HOURS * 60 * 60 * 1000)
 
@@ -150,12 +160,14 @@ export async function POST(request: NextRequest) {
       city_id: cityId || null,
       title,
       description: description || null,
-      image_url: imageUrl || null,
+      image_url: imageUrl || (images && images.length > 0 ? images[0] : null),
+      images: images || [],
       original_price_cents: originalPriceCents,
       promotional_price_cents: promotionalPriceCents,
       external_link: externalLink || null,
       whatsapp_link: whatsappLink || null,
       is_national: isNational || false,
+      delivery_areas: deliveryAreas || [],
       starts_at: startsAt.toISOString(),
       expires_at: expiresAt.toISOString(),
     })
@@ -166,7 +178,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: offerError.message }, { status: 500 })
   }
 
-  // Atualizar produto (historico de preco)
+  // Atualizar produto (histórico de preço)
   const lowestPrice = product.lowest_price_cents
     ? Math.min(product.lowest_price_cents, promotionalPriceCents)
     : promotionalPriceCents
@@ -180,7 +192,7 @@ export async function POST(request: NextRequest) {
     })
     .eq("id", product.id)
 
-  // Registrar historico
+  // Registrar histórico
   await supabase.from("offer_history").insert({
     product_id: product.id,
     company_id: company.id,

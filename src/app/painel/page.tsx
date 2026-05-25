@@ -73,7 +73,7 @@ export default async function PainelPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Ola, {company.name}</h1>
+          <h1 className="text-2xl font-bold">Olá, {company.name}</h1>
           <p className="text-muted-foreground text-sm">
             Gerencie suas ofertas e acompanhe o desempenho.
           </p>
@@ -103,7 +103,7 @@ export default async function PainelPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Visualizacoes</CardTitle>
+            <CardTitle className="text-sm font-medium">Visualizações</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -129,13 +129,13 @@ export default async function PainelPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Interacoes 30d</CardTitle>
+            <CardTitle className="text-sm font-medium">Interações 30d</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{recentClicks || 0}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              ultimos 30 dias
+              últimos 30 dias
             </p>
           </CardContent>
         </Card>

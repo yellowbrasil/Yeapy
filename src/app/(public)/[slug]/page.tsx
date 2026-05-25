@@ -7,6 +7,9 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import { OfferGrid } from "@/components/offer/offer-grid"
 import { LocalBusinessJsonLd } from "@/components/seo/json-ld"
+import { ReviewForm } from "@/components/reviews/review-form"
+import { ReviewList } from "@/components/reviews/review-list"
+import { VerifiedBadge } from "@/components/verification/verified-badge"
 import type { Metadata } from "next"
 
 interface CompanyPageProps {
@@ -22,7 +25,7 @@ export async function generateMetadata({ params }: CompanyPageProps): Promise<Me
     .eq("slug", slug)
     .single()
 
-  if (!company) return { title: "Empresa nao encontrada" }
+  if (!company) return { title: "Empresa não encontrada" }
 
   return {
     title: company.name,
@@ -56,7 +59,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)
@@ -72,7 +75,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     .from("offers")
     .select(`
       *,
-      company:companies(id, name, slug, logo_url, whatsapp),
+      company:companies(id, name, slug, logo_url, whatsapp, is_verified),
       category:categories(id, name, slug),
       city:cities(id, name, state, slug),
       product:products(id, name, lowest_price_cents, total_offers)
@@ -124,7 +127,10 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
               )}
 
               <div>
-                <h1 className="text-xl font-bold">{company.name}</h1>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-xl font-bold">{company.name}</h1>
+                  <VerifiedBadge isVerified={company.is_verified} size="sm" />
+                </div>
                 {company.description && (
                   <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
                     {company.description}
@@ -193,13 +199,30 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
           </div>
 
           {(expiredOffers || []).length > 0 && (
-            <div>
+            <div className="mb-12">
               <h2 className="text-xl font-bold mb-4">Ofertas anteriores</h2>
               <div className="opacity-60">
                 <OfferGrid offers={(expiredOffers || []) as any} />
               </div>
             </div>
           )}
+
+          {/* Avaliações */}
+          <div className="border-t pt-12">
+            <h2 className="text-xl font-bold mb-6">Avaliações</h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Formulário */}
+              <div className="lg:col-span-1">
+                <ReviewForm companyId={company.id} />
+              </div>
+
+              {/* Lista de avaliações */}
+              <div className="lg:col-span-2">
+                <ReviewList companyId={company.id} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

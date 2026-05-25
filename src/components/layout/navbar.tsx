@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
-import { Menu, Search, Flame, User, LogOut } from "lucide-react"
+import { Menu, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -16,6 +17,8 @@ import { createClient } from "@/lib/supabase/client"
 const navLinks = [
   { href: "/", label: "Ofertas" },
   { href: "/busca", label: "Buscar" },
+  { href: "/precos", label: "Preços" },
+  { href: "/quem-somos", label: "Quem somos" },
 ]
 
 export function Navbar() {
@@ -47,11 +50,15 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2">
-          <Flame className="h-7 w-7 text-primary" />
-          <span className="text-xl font-bold tracking-tight">
-            <span className="text-primary">Y</span>eapy
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/logo.png"
+            alt="Yeapy"
+            width={494}
+            height={165}
+            className="h-28 w-auto"
+            priority
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
@@ -67,10 +74,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/busca" className="md:hidden">
-            <Search className="h-5 w-5 text-muted-foreground" />
-          </Link>
-
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger>

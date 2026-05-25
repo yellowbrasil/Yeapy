@@ -14,10 +14,10 @@ export const metadata: Metadata = {
     template: "%s | Yeapy",
   },
   description:
-    "Descubra ofertas temporarias com prazo de 24 horas. Oportunidades reais todos os dias com precos que so diminuem.",
+    "Descubra ofertas temporárias com prazo de 24 horas. Oportunidades reais todos os dias com preços que só diminuem.",
   keywords: [
     "ofertas",
-    "promocoes",
+    "promoções",
     "24 horas",
     "oportunidades",
     "descontos",
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Yeapy — Ofertas de 24 horas",
     description:
-      "Descubra ofertas temporarias com prazo de 24 horas. Oportunidades reais todos os dias.",
+      "Descubra ofertas temporárias com prazo de 24 horas. Oportunidades reais todos os dias.",
     type: "website",
     locale: "pt_BR",
   },

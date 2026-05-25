@@ -57,7 +57,7 @@ export function PriceGate({
       <Link href="/login?redirect=/">
         <Button variant="outline" size="sm" className="w-full text-xs">
           <Lock className="h-3 w-3 mr-1" />
-          Cadastre-se gratis para ver o preco
+          Cadastre-se grátis para ver o preço
         </Button>
       </Link>
     </div>
