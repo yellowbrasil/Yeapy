@@ -1,0 +1,100 @@
+═══════════════════════════════════════════════════════════════════
+                    DEPLOY - COPIE E COLE NO VPS
+═══════════════════════════════════════════════════════════════════
+
+IMPORTANTE: Execute cada comando NO TERMINAL DA VPS (não aqui)
+
+═══════════════════════════════════════════════════════════════════
+PASSO 1: Ir para pasta do projeto
+═══════════════════════════════════════════════════════════════════
+
+cd /root/yeapy
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 2: Git pull (trazer as mudanças)
+═══════════════════════════════════════════════════════════════════
+
+git pull origin main
+
+(Esperado ver: Fast-forward ... 10 files changed)
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 3: Verificar .env.local e adicionar ASAAS_WEBHOOK_SECRET
+═══════════════════════════════════════════════════════════════════
+
+nano .env.local
+
+(Adicione uma nova linha:)
+ASAAS_WEBHOOK_SECRET=seu_webhook_secret_do_asaas
+
+(Pressione: Ctrl+O, Enter, Ctrl+X para salvar e sair)
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 4: Build do projeto
+═══════════════════════════════════════════════════════════════════
+
+npm run build
+
+(Espere terminar, deve dizer: ✓ Compiled successfully)
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 5: Restart PM2 (ZERO DOWNTIME!)
+═══════════════════════════════════════════════════════════════════
+
+pm2 reload yeapy --wait-ready
+
+(Esperado: [PM2] App successfully reloaded)
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 6: Verificar status
+═══════════════════════════════════════════════════════════════════
+
+pm2 status
+
+(Deve mostrar "yeapy" com status "online")
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 7: Ver logs para confirmar
+═══════════════════════════════════════════════════════════════════
+
+pm2 logs yeapy --lines 20
+
+(Ctrl+C para sair dos logs)
+
+
+═══════════════════════════════════════════════════════════════════
+PASSO 8: Testar se o site está online
+═══════════════════════════════════════════════════════════════════
+
+curl https://yeapy.shop/api/offers?limit=1
+
+(Esperado: JSON com offers e count)
+
+
+═══════════════════════════════════════════════════════════════════
+✅ SE CHEGOU AQUI = SUCESSO!
+═══════════════════════════════════════════════════════════════════
+
+Todas as 4 features de segurança estão agora ativas:
+✅ CSRF Protection
+✅ Session Timeout (30 min)
+✅ CPF/CNPJ Validation
+✅ Webhook Signing (Asaas)
+
+Zero downtime = Site nunca foi offline!
+
+═══════════════════════════════════════════════════════════════════
+SE ALGO DER ERRADO - ROLLBACK DE EMERGÊNCIA
+═══════════════════════════════════════════════════════════════════
+
+git reset --hard HEAD~2
+npm run build
+pm2 reload yeapy --wait-ready
+
+═══════════════════════════════════════════════════════════════════
