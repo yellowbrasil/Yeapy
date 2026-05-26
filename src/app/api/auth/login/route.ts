@@ -10,6 +10,7 @@ import {
   getIpFromRequest,
 } from "@/lib/security/bruteforce"
 import { logSecurityEvent } from "@/lib/security/logs"
+import { updateSessionActivity } from "@/lib/security/session-timeout"
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -103,6 +104,9 @@ export async function POST(request: NextRequest) {
 
     // Registrar tentativa bem-sucedida
     await recordLoginAttempt(email, ipAddress, true)
+
+    // Registrar atividade de sessão (para timeout)
+    updateSessionActivity(signInData.user.id)
 
     // Logar sucesso
     await logSecurityEvent(

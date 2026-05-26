@@ -3,6 +3,7 @@ import { z } from "zod"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { checkRateLimit, handleRateLimitError } from "@/lib/security/ratelimit"
 import { addCorsHeaders } from "@/lib/security/cors"
+import { validateBrazilianDocument } from "@/lib/security/cpf-cnpj"
 
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -10,6 +11,8 @@ const registerSchema = z.object({
   companyName: z.string().min(2).max(200),
   slug: z.string().min(2).max(50).regex(/^[a-z0-9-]+$/),
   whatsapp: z.string().optional(),
+  cpf: z.string().optional(),
+  cnpj: z.string().optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -53,7 +56,24 @@ export async function POST(request: NextRequest) {
     return addCorsHeaders(response)
   }
 
-  const { email, password, companyName, slug, whatsapp } = data
+  const { email, password, companyName, slug, whatsapp, cpf, cnpj } = data
+
+  // Validar CPF ou CNPJ se fornecido
+  if (cpf && !validateBrazilianDocument(cpf, "cpf")) {
+    const response = NextResponse.json(
+      { error: "CPF inválido. Verifique o número informado." },
+      { status: 400 }
+    )
+    return addCorsHeaders(response)
+  }
+
+  if (cnpj && !validateBrazilianDocument(cnpj, "cnpj")) {
+    const response = NextResponse.json(
+      { error: "CNPJ inválido. Verifique o número informado." },
+      { status: 400 }
+    )
+    return addCorsHeaders(response)
+  }
 
   const admin = createAdminClient()
 

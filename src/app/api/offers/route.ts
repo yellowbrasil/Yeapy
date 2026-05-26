@@ -7,6 +7,9 @@ import { checkRateLimit } from "@/lib/security/ratelimit"
 import { addCorsHeaders } from "@/lib/security/cors"
 import { getIpAddress } from "@/lib/security/auth"
 import { logSecurityEvent } from "@/lib/security/logs"
+import { verifyCsrfToken } from "@/lib/security/csrf"
+import { checkSessionTimeout, updateSessionActivity } from "@/lib/security/session-timeout"
+import { validateBrazilianDocument } from "@/lib/security/cpf-cnpj"
 
 const createOfferSchema = z.object({
   title: z.string().min(3).max(200),
@@ -22,6 +25,7 @@ const createOfferSchema = z.object({
   imageUrl: z.string().url().optional(),
   images: z.array(z.string().url()).optional(),
   deliveryAreas: z.array(z.string()).optional(),
+  csrfToken: z.string().optional(),
 })
 
 // GET /api/offers — listar ofertas ativas (publico)
@@ -94,6 +98,21 @@ export async function POST(request: NextRequest) {
     return addCorsHeaders(response)
   }
 
+  // Session timeout check
+  const { isExpired, sessionId } = checkSessionTimeout(request)
+  if (isExpired) {
+    const response = NextResponse.json(
+      { error: "Sessão expirada por inatividade. Faça login novamente." },
+      { status: 401 }
+    )
+    return addCorsHeaders(response)
+  }
+
+  // Update session activity on each request
+  if (sessionId) {
+    updateSessionActivity(sessionId)
+  }
+
   let body: unknown
   try {
     body = await request.json()
@@ -116,6 +135,26 @@ export async function POST(request: NextRequest) {
     }
     const response = NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
     return addCorsHeaders(response)
+  }
+
+  // CSRF token verification
+  if (data.csrfToken) {
+    const sessionId = user.id
+    if (!verifyCsrfToken(sessionId, data.csrfToken)) {
+      const ipAddress = getIpAddress(request)
+      await logSecurityEvent(
+        "csrf_token_invalid",
+        user.id,
+        null,
+        { action: "create_offer" },
+        ipAddress
+      )
+      const response = NextResponse.json(
+        { error: "Token CSRF inválido. Recarregue a página." },
+        { status: 403 }
+      )
+      return addCorsHeaders(response)
+    }
   }
 
   const {

@@ -16,6 +16,9 @@ export type SecurityEventType =
   | "document_uploaded"
   | "rate_limit_exceeded"
   | "suspicious_activity"
+  | "csrf_token_invalid"
+  | "webhook_signature_invalid"
+  | "session_expired"
 
 export async function logSecurityEvent(
   eventType: SecurityEventType,

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { validateAsaasWebhook, getWebhookPayload } from "@/lib/security/webhook"
+import { logSecurityEvent } from "@/lib/security/logs"
 
 // Asaas webhook events
 // PAYMENT_CONFIRMED — pagamento confirmado (PIX, boleto, cartão)
@@ -10,13 +12,29 @@ import { createAdminClient } from "@/lib/supabase/admin"
 // SUBSCRIPTION_DELETED — assinatura cancelada
 
 export async function POST(request: NextRequest) {
-  // Verify webhook token
-  const webhookToken = request.headers.get("asaas-access-token")
-  if (webhookToken && webhookToken !== process.env.ASAAS_WEBHOOK_TOKEN) {
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 })
+  // Get webhook payload and signature
+  const { payload, signature } = await getWebhookPayload(request)
+
+  // Verify webhook signature
+  const signatureValidation = validateAsaasWebhook(payload, signature)
+  if (!signatureValidation.valid) {
+    const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
+    await logSecurityEvent(
+      "webhook_signature_invalid",
+      null,
+      null,
+      { error: signatureValidation.error, service: "asaas" },
+      ipAddress
+    )
+    return NextResponse.json({ error: signatureValidation.error }, { status: 401 })
   }
 
-  const body = await request.json()
+  let body: any
+  try {
+    body = JSON.parse(payload)
+  } catch {
+    return NextResponse.json({ error: "JSON inválido" }, { status: 400 })
+  }
   const { event, payment, subscription } = body
 
   const admin = createAdminClient()
