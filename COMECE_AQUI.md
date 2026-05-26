@@ -9,7 +9,7 @@ Implementei **4 features de segurança críticas** no Yeapy:
 3. ✅ **CPF/CNPJ Validation** — Valida documentos brasileiros
 4. ✅ **Webhook Signing** — Valida webhooks do Asaas
 
-**Zero downtime** — Site nunca sai do ar!
+**Zero downtime + Auto-Rollback** — Site nunca sai do ar! Se algo der errado, volta automaticamente!
 
 ---
 
@@ -69,6 +69,25 @@ git push origin main
 **SEM VOCÊ FAZER NADA!**
 
 ---
+
+## 🛡️ Deploy 100% Seguro (Auto-Rollback)
+
+Cada deploy passa por:
+
+1. **Backup** da versão anterior (salvo no VPS)
+2. **Build test** local (antes de tocar em produção)
+3. **Git pull** da versão nova
+4. **Build no VPS** (testa antes de usar)
+5. **PM2 reload** com --wait-ready (zero downtime)
+6. **Health check** (testa se site está online)
+7. **Auto-rollback** se algo der errado!
+
+Se em qualquer etapa algo falhar:
+- ❌ Build falha → Rollback automático
+- ❌ PM2 falha → Rollback automático
+- ❌ Site fica offline → Rollback automático
+
+**Site NUNCA fica offline!** 🛡️
 
 ## 📊 Ver Deploy em Tempo Real
 
