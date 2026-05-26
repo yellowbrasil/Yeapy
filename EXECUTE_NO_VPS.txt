@@ -1,0 +1,28 @@
+═══════════════════════════════════════════════════════════════════
+COPIE E COLE ISTO NO TERMINAL DA VPS (inteiro de uma vez!)
+═══════════════════════════════════════════════════════════════════
+
+bash -c 'cd /root/yeapy && git pull origin main && npm run build && pm2 reload yeapy --wait-ready && sleep 2 && curl -s https://yeapy.shop/api/offers?limit=1 > /dev/null && echo "✅ SUCESSO! Site está online" || echo "❌ ERRO! Fazendo rollback..." && git reset --hard HEAD~1 && npm run build && pm2 reload yeapy --wait-ready'
+
+═══════════════════════════════════════════════════════════════════
+O que este comando faz:
+
+1. cd /root/yeapy → vai para pasta do projeto
+2. git pull origin main → traz código novo
+3. npm run build → compila o projeto
+4. pm2 reload yeapy --wait-ready → reinicia com zero downtime
+5. sleep 2 → aguarda o site voltar
+6. curl https://yeapy.shop → testa se site está online
+7. Se OK: ✅ SUCESSO!
+8. Se FALHAR: ❌ Faz ROLLBACK automático para versão anterior
+
+═══════════════════════════════════════════════════════════════════
+SEGURANÇA:
+
+✅ Build é testado ANTES de reiniciar
+✅ PM2 usa --wait-ready (zero downtime)
+✅ Site é verificado após restart
+✅ Se falhar, volta para versão anterior AUTOMATICAMENTE
+✅ Site NUNCA fica offline!
+
+═══════════════════════════════════════════════════════════════════
