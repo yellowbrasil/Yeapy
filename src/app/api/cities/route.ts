@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
+// GET /api/cities — list all active cities
+export async function GET() {
+  const supabase = await createClient()
+
+  const { data: cities, error } = await supabase
+    .from("cities")
+    .select("id, name, state, slug, is_active")
+    .eq("is_active", true)
+    .order("name")
+
+  if (error) {
+    return NextResponse.json({ error: "Erro ao listar cidades" }, { status: 500 })
+  }
+
+  return NextResponse.json({ cities: cities || [] })
+}
+
 // POST /api/cities — create new city dynamically
 export async function POST(request: NextRequest) {
   const supabase = await createClient()

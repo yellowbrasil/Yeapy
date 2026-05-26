@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
+// GET /api/categories — list all active categories
+export async function GET() {
+  const supabase = await createClient()
+
+  const { data: categories, error } = await supabase
+    .from("categories")
+    .select("id, name, slug, is_active")
+    .eq("is_active", true)
+    .order("name")
+
+  if (error) {
+    return NextResponse.json({ error: "Erro ao listar categorias" }, { status: 500 })
+  }
+
+  return NextResponse.json({ categories: categories || [] })
+}
+
 // POST /api/categories — create new category dynamically
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
