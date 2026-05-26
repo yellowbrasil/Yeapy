@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { OFFER_DURATION_HOURS } from "@/lib/constants"
 import { checkRateLimit } from "@/lib/security/ratelimit"
 import { addCorsHeaders } from "@/lib/security/cors"
+import { getIpAddress } from "@/lib/security/auth"
+import { logSecurityEvent } from "@/lib/security/logs"
 
 const createOfferSchema = z.object({
   title: z.string().min(3).max(200),
@@ -257,6 +259,14 @@ export async function POST(request: NextRequest) {
     promotional_price_cents: promotionalPriceCents,
     original_price_cents: originalPriceCents,
   })
+
+  // Registrar criação de oferta nos logs
+  const ipAddress = getIpAddress(request)
+  await logSecurityEvent("offer_created", user.id, company.id, {
+    offerId: offer?.id,
+    title: title,
+    price: promotionalPriceCents,
+  }, ipAddress)
 
   const response = NextResponse.json({ offer }, { status: 201 })
   return addCorsHeaders(response)
