@@ -1,19 +1,39 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OFFER_DURATION_HOURS } from "@/lib/constants"
+import { checkRateLimit } from "@/lib/security/ratelimit"
+import { addCorsHeaders } from "@/lib/security/cors"
+
+const createOfferSchema = z.object({
+  title: z.string().min(3).max(200),
+  description: z.string().min(10).max(5000),
+  productName: z.string().min(2).max(200),
+  categoryId: z.string().uuid(),
+  cityId: z.string().uuid(),
+  originalPriceCents: z.number().positive(),
+  promotionalPriceCents: z.number().positive(),
+  externalLink: z.string().url().optional(),
+  whatsappLink: z.string().url().optional(),
+  isNational: z.boolean(),
+  imageUrl: z.string().url().optional(),
+  images: z.array(z.string().url()).optional(),
+  deliveryAreas: z.array(z.string()).optional(),
+})
 
 // GET /api/offers — listar ofertas ativas (publico)
 export async function GET(request: NextRequest) {
   const supabase = createAdminClient()
   const { searchParams } = new URL(request.url)
 
-  const city = searchParams.get("city")
-  const category = searchParams.get("category")
-  const search = searchParams.get("q")
+  // Sanitize inputs
+  const city = searchParams.get("city")?.slice(0, 100) || null
+  const category = searchParams.get("category")?.slice(0, 100) || null
+  const search = searchParams.get("q")?.slice(0, 200) || null
   const national = searchParams.get("national")
-  const limit = parseInt(searchParams.get("limit") || "20")
-  const offset = parseInt(searchParams.get("offset") || "0")
+  const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 100) // Max 100
+  const offset = Math.max(parseInt(searchParams.get("offset") || "0"), 0)
 
   let query = supabase
     .from("offers")
@@ -44,22 +64,58 @@ export async function GET(request: NextRequest) {
   const { data, error, count } = await query
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    const response = NextResponse.json({ error: error.message }, { status: 500 })
+    return addCorsHeaders(response)
   }
 
-  return NextResponse.json({ offers: data, count })
+  const response = NextResponse.json({ offers: data, count })
+  return addCorsHeaders(response)
 }
 
 // POST /api/offers — criar oferta (autenticado)
 export async function POST(request: NextRequest) {
+  // Rate limiting: máximo 20 ofertas por minuto por IP (por anunciante)
+  const { allowed } = await checkRateLimit(request, 20, 60000)
+  if (!allowed) {
+    const response = NextResponse.json(
+      { error: "Muitas requisições. Tente novamente em alguns instantes." },
+      { status: 429 }
+    )
+    return addCorsHeaders(response)
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    const response = NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    return addCorsHeaders(response)
   }
 
-  const body = await request.json()
+  let body: unknown
+  try {
+    body = await request.json()
+  } catch {
+    const response = NextResponse.json({ error: "JSON inválido" }, { status: 400 })
+    return addCorsHeaders(response)
+  }
+
+  // Validar com Zod
+  let data: z.infer<typeof createOfferSchema>
+  try {
+    data = createOfferSchema.parse(body)
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const response = NextResponse.json(
+        { error: error.issues[0].message },
+        { status: 400 }
+      )
+      return addCorsHeaders(response)
+    }
+    const response = NextResponse.json({ error: "Dados inválidos" }, { status: 400 })
+    return addCorsHeaders(response)
+  }
+
   const {
     title,
     description,
@@ -74,7 +130,7 @@ export async function POST(request: NextRequest) {
     imageUrl,
     images,
     deliveryAreas,
-  } = body
+  } = data
 
   // Buscar empresa do usuario
   const { data: company } = await supabase
@@ -175,7 +231,8 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (offerError) {
-    return NextResponse.json({ error: offerError.message }, { status: 500 })
+    const response = NextResponse.json({ error: offerError.message }, { status: 500 })
+    return addCorsHeaders(response)
   }
 
   // Atualizar produto (histórico de preço)
@@ -201,5 +258,6 @@ export async function POST(request: NextRequest) {
     original_price_cents: originalPriceCents,
   })
 
-  return NextResponse.json({ offer }, { status: 201 })
+  const response = NextResponse.json({ offer }, { status: 201 })
+  return addCorsHeaders(response)
 }
